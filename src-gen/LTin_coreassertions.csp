@@ -1,0 +1,5 @@
+-- generate include
+include "defs/LTin_State_Machine_coreassertions.csp"
+include "LTin.csp"
+include "defs/LTin_Module_coreassertions.csp"
+

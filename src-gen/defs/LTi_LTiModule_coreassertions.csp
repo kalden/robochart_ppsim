@@ -1,0 +1,6 @@
+assert LTi_LTiModule_O :[deadlock-free]	
+assert LTi_LTiModule_O;RUN({r__}) :[deadlock-free]
+assert LTi_LTiModule_O :[deterministic]
+assert LTi_LTiModule_O :[divergence-free]
+	
+chase_LTi_LTiModule = chase(LTi_LTiModule_O)

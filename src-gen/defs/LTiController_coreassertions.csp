@@ -1,0 +1,7 @@
+-- generate assert
+assert LTiController_O(0,0);RUN({r__}) :[deadlock-free]
+assert LTiController_O(0,0) :[deterministic]
+assert LTiController_O(0,0) :[divergence-free]
+	
+chase_LTiController = chase(LTiController_O(0,0))
+

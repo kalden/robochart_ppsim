@@ -1,0 +1,105 @@
+-- generate string
+nametype string = LSeq(Char,2)
+
+-- generate LTo_LTo_State_Machine_retLigandProbability
+LTo_LTo_State_Machine_retLigandProbability = 0
+
+-- generate calculate_adhesion_probability
+calculate_adhesion_probability() = 0
+
+-- generate LTiStep_cellDivisionTime
+LTiStep_cellDivisionTime = 0
+
+-- generate LTo_Step_retLigandTime
+LTo_Step_retLigandTime = 0
+
+-- generate chemotactic_walk
+chemotactic_walk() = true
+
+-- generate LTi_LTiStep_cellDivisionTime
+LTi_LTiStep_cellDivisionTime = 0
+
+-- generate disassociate_cells
+disassociate_cells() = true
+
+-- generate LTo_LTo_Step_cellDivisionTime
+LTo_LTo_Step_cellDivisionTime = 0
+
+-- generate LTo_Step_cellDivisionTime
+LTo_Step_cellDivisionTime = 0
+
+-- generate chemokine_direction
+chemokine_direction() = 0
+
+-- generate Plus
+Plus(e1,e2,T) = if member(e1+e2,T) then e1+e2 else e1
+
+-- generate LTi_LTiStep_retLigandTime
+LTi_LTiStep_retLigandTime = 0
+
+-- generate chemotactic_Walk
+chemotactic_Walk() = true
+
+-- generate LTin_Step_cellDivisionTime
+LTin_Step_cellDivisionTime = 0
+
+-- generate nat
+nametype nat = {0..2}
+
+-- generate LTo_State_Machine_retLigandProbability
+LTo_State_Machine_retLigandProbability = 0
+
+-- generate LTo_LTo_Step_retLigandTime
+LTo_LTo_Step_retLigandTime = 0
+
+-- generate LTin_Step_retLigandTime
+LTin_Step_retLigandTime = 0
+
+-- generate detect_cell_bind
+detect_cell_bind(loc,cellType) = true
+
+-- generate real
+nametype real = {0,1}
+
+-- generate LTiStep_retLigandTime
+LTiStep_retLigandTime = 0
+
+-- generate int
+nametype int = { -2..2}
+
+-- generate Random_Walk
+Random_Walk() = 0
+
+-- generate Div
+Div(e1,e2,T) = if member(e1/e2,T) then e1/e2 else e1
+
+-- generate measure_chemokine_expression
+measure_chemokine_expression(loc) = 0
+
+-- generate Neg
+Neg(e1,T) = if member(-e1,T) then -e1 else e1
+
+-- generate determine_movement_direction
+determine_movement_direction(high_chemokine_concentration) = 0
+
+-- generate boolean
+nametype boolean = Bool
+
+-- generate Mult
+Mult(e1,e2,T) = if member(e1*e2,T) then e1*e2 else e1
+
+-- generate calculate_angle_from_direction
+calculate_angle_from_direction(direction) = 0
+
+-- generate Modulus
+Modulus(e1,e2,T) = if member(e1%e2,T) then e1%e2 else e1
+
+-- generate Chemotactic_Walk
+Chemotactic_Walk() = 0
+
+-- generate Minus
+Minus(e1,e2,T) = if member(e1-e2,T) then e1-e2 else e1
+
+-- generate probability_responds_to_chemokine
+probability_responds_to_chemokine() = 0
+

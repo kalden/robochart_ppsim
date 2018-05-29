@@ -1,0 +1,6 @@
+assert LTi_LTi_State_Machine_O(0,0) :[deadlock-free]	
+assert LTi_LTi_State_Machine_O(0,0);RUN({r__}) :[deadlock-free]
+assert LTi_LTi_State_Machine_O(0,0) :[deterministic]
+assert LTi_LTi_State_Machine_O(0,0) :[divergence-free]
+	
+chase_LTi_LTi_State_Machine = chase(LTi_LTi_State_Machine_O(0,0))

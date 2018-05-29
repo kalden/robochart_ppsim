@@ -1,0 +1,7 @@
+-- generate assert
+assert LTin_Module_O;RUN({r__}) :[deadlock-free]
+assert LTin_Module_O :[deterministic]
+assert LTin_Module_O :[divergence-free]
+	
+chase_LTin_Module = chase(LTin_Module_O)
+

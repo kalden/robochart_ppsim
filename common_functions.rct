@@ -1,0 +1,38 @@
+package
+common_functions
+import LTo::*
+interface Operations {
+	 Random_Walk() disassociate_cells()
+divide_cells()
+}
+interface System_Parameters {
+	var maxVCAMProbability : real
+var chemokine_in_environment : boolean
+const retLigandTime : real
+	var maxExpressionReached : boolean
+	var adhesionIncrement : real
+	var chemokineIncrement : real
+	var maxChemokineExpression : real
+const cellDivisionTime : int
+}
+datatype Double2D {
+	x : real
+	y : real
+}
+function Chemotactic_Walk() : real {
+}
+function calculate_angle_from_direction( direction : int) : int {
+}
+function determine_movement_direction( high_chemokine_concentration : int) :
+int {
+}
+function measure_chemokine_expression( loc : Double2D) : int {
+}
+function Random_Walk() : real {
+}
+function calculate_adhesion_probability() : real {
+}
+function probability_responds_to_chemokine() : int {
+}
+function detect_cell_bind( loc : Double2D , cellType : string) : boolean {
+}

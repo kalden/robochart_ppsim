@@ -1,0 +1,184 @@
+package
+LTo import common_functions::*
+interface LTo_Attributes {
+	var new_LTin_binding : boolean
+	var new_LTi_binding : boolean
+	var adhesionExpressed : real
+	var chemokineExpressed : real
+var LTo_loc : Double2D
+}
+robotic platform LTo_Step {
+	provides Operations provides System_Parameters provides LTo_Attributes
+}
+controller LTo_Controller {
+	requires Operations requires System_Parameters requires LTo_Attributes sref
+	stm_ref0 = LTo_State_Machine
+}
+stm LTo_State_Machine {
+	requires System_Parameters
+	requires LTo_Attributes
+	requires Operations
+	var expressing_RET : boolean
+	const retLigandProbability : real
+	initial i0
+	state Not_Expressing_RET_Ligand {
+		entry expressing_RET = false
+	}
+	state Expressing_RET_Ligand {
+		
+	entry expressing_RET = true ; new_LTin_binding = detect_cell_bind ( LTo_loc ,
+		"LTin" )
+	}
+	probabilistic p0 state Upregulate_Adhesion_Molecules {
+		
+	entry new_LTin_binding = detect_cell_bind ( LTo_loc , "LTin" ) ;
+		new_LTi_binding = detect_cell_bind ( LTo_loc , "LTi" ) ; if adhesionExpressed
+		< maxVCAMProbability then adhesionExpressed = adhesionExpressed +
+		adhesionIncrement end
+	}
+	state Expressing_Chemokines {
+		state Dividing {
+			
+		entry divide_cells() ; cell_division_clock = 0
+		}
+		state Interphase {
+		entry cell_division_clock = cell_division_clock + 1
+		}
+		initial i0
+		transition t0 {
+			from i0
+			to Interphase
+		}
+		transition t1 {
+			from Interphase
+			to Dividing
+			trigger
+			condition cell_division_clock == cellDivisionTime
+		}
+		
+	entry if new_LTin_binding == true then if adhesionExpressed <
+		maxVCAMProbability then adhesionExpressed = adhesionExpressed +
+		adhesionIncrement end else if chemokineExpressed < maxChemokineExpression
+		then chemokineExpressed = chemokineExpressed + chemokineIncrement end end ;
+		if adhesionExpressed >= maxVCAMProbability /\ chemokineExpressed >=
+		maxChemokineExpression then maxExpressionReached = true end ;
+		new_LTin_binding = detect_cell_bind ( LTo_loc , "LTin" ) ; new_LTi_binding =
+		detect_cell_bind ( LTo_loc , "LTi" )
+	}
+	state Mature_LTo {
+	initial i0
+		state Interphase {
+			entry cell_division_clock = cell_division_clock + 1
+		}
+		state Dividing {
+			entry divide_cells() ; cell_division_clock = 0
+		}
+		transition t0 {
+			from i0
+			to Interphase
+		}
+		transition t1 {
+			from Interphase
+			to Dividing
+			trigger
+			condition cell_division_clock == cellDivisionTime
+		}
+	}
+	transition t0 {
+		from i0
+		to p0
+		trigger
+		action # T ; new_LTin_binding = false ; new_LTi_binding = false
+	}
+	transition t1 {
+		from p0
+		to Not_Expressing_RET_Ligand
+		probability 1 - retLigandProbability
+	}
+	transition t2 {
+		from p0
+		to Expressing_RET_Ligand
+		probability retLigandProbability
+	}
+	transition t3 {
+		from Upregulate_Adhesion_Molecules
+		to Not_Expressing_RET_Ligand
+		trigger
+		condition since ( T ) > retLigandTime
+	}
+	transition t4 {
+		from Expressing_RET_Ligand
+		to Upregulate_Adhesion_Molecules
+		trigger
+		condition new_LTin_binding == true /\ since ( T ) > 0
+		action # T
+	}
+	transition t5 {
+		from Upregulate_Adhesion_Molecules
+		to Upregulate_Adhesion_Molecules
+		trigger
+		condition new_LTin_binding == true /\ since ( T ) > 0
+		action # T
+	}
+	transition t6 {
+		from Upregulate_Adhesion_Molecules
+		to Expressing_Chemokines
+		trigger
+		condition new_LTi_binding == true /\ since ( T ) > 0
+		action # T
+	}
+	transition t7 {
+		from Expressing_Chemokines
+		to Mature_LTo
+		trigger
+		condition maxExpressionReached == true /\ since ( T ) > 0
+		action # T
+	}
+	transition t8 {
+		from Expressing_Chemokines
+		to Not_Expressing_RET_Ligand
+		trigger
+		condition since ( T ) > retLigandTime
+	}
+	transition t9 {
+		from Mature_LTo
+		to Not_Expressing_RET_Ligand
+		trigger
+		condition since ( T ) > retLigandTime
+	}
+	transition t10 {
+		from Expressing_Chemokines
+		to Expressing_Chemokines
+		trigger
+		condition new_LTi_binding == true /\ since ( T ) > 0
+		action # T
+	}
+	transition t11 {
+		from Expressing_Chemokines
+		to Expressing_Chemokines
+		trigger
+		condition new_LTin_binding == true /\ since ( T ) > 0
+		action # T
+	}
+	clock T
+var cell_division_clock : int
+	transition t12 {
+		from Expressing_Chemokines
+		to Expressing_Chemokines
+		trigger
+		condition new_LTin_binding == false /\ new_LTi_binding == false /\ since ( T )
+		> 0
+		action # T
+	}
+	transition t13 {
+		from Mature_LTo
+		to Mature_LTo
+	trigger
+		condition since ( T ) > 0
+		action # T
+	}
+}
+module LTo_Module {
+	cref ctrl_ref0 = LTo_Controller
+	rref rp_ref0 = LTo_Step
+}

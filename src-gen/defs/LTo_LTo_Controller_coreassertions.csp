@@ -1,0 +1,7 @@
+-- generate assert
+assert LTo_LTo_Controller_O(0,0);RUN({r__}) :[deadlock-free]
+assert LTo_LTo_Controller_O(0,0) :[deterministic]
+assert LTo_LTo_Controller_O(0,0) :[divergence-free]
+	
+chase_LTo_LTo_Controller = chase(LTo_LTo_Controller_O(0,0))
+

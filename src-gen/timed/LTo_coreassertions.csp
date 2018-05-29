@@ -1,0 +1,5 @@
+-- generate include
+include "defs/LTo_LTo_Controller_coreassertions.csp"
+include "defs/LTo_LTo_State_Machine_coreassertions.csp"
+include "defs/LTo_LTo_Module_coreassertions.csp"
+
