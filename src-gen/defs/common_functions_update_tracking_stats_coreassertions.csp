@@ -1,0 +1,6 @@
+assert common_functions_update_tracking_stats_O((0,0,0,0,(0,0),(0,0),(0,0)),0,(0,0),0,("",true)) :[deadlock-free]	
+assert common_functions_update_tracking_stats_O((0,0,0,0,(0,0),(0,0),(0,0)),0,(0,0),0,("",true));RUN({r__}) :[deadlock-free]
+assert common_functions_update_tracking_stats_O((0,0,0,0,(0,0),(0,0),(0,0)),0,(0,0),0,("",true)) :[deterministic]
+assert common_functions_update_tracking_stats_O((0,0,0,0,(0,0),(0,0),(0,0)),0,(0,0),0,("",true)) :[divergence-free]
+	
+chase_common_functions_update_tracking_stats = chase(common_functions_update_tracking_stats_O((0,0,0,0,(0,0),(0,0),(0,0)),0,(0,0),0,("",true)))

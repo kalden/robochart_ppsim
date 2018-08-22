@@ -1,49 +1,74 @@
-diagram LTin import common_functions::*
-interface LTin_Attributes {
+diagram LTin import common_functions::* 
+interface LTin_Attributes {  
 	var LTin_loc : Double2D
-	var angle_to_move : real
-}
-robotic platform LTin_Step {
-	provides Operations provides System_Parameters provides LTin_Attributes
+	var angle_to_move : real    
+var cellSpeed : real                   
+	var cell_id : int     
+	var tracking : Tracking_Stats                 
+} 
+robotic platform LTin_Step {    
+	provides LTin_Attributes provides Operations   
 }
 controller LTin_Controller {
-	requires Operations requires System_Parameters requires LTin_Attributes sref
+	requires LTin_Attributes sref 
 	stm_ref0 = LTin_State_Machine
+requires Operations
 }
-stm LTin_State_Machine {
-	requires Operations
-	requires System_Parameters
-	requires LTin_Attributes
-	var move_finished : boolean
-	var adhered : boolean
-	var contactedCell : boolean
+stm LTin_State_Machine { 
+	requires LTin_Attributes  
+	var move_finished : boolean = false
+	var adhered : boolean = false
+	var contactedCell_ID : int = - 1
 	var probabilityOfAdhesion : real
 	state Moving {
 		initial i0
 		state Motile {
-			entry if move_finished == false then probabilityOfAdhesion = Random_Walk ( )
-			end
+			
+		
+		
+		
+		entry if move_finished == false then if movement_interval > distanceToMove
+			then movement_interval = distanceToMove end ; LTin_loc =
+			calculateNewPosition ( LTin_loc , angle_to_move , movement_interval ) ;
+			distanceToMove = distanceToMove - movement_interval ; distanceMoved =
+			distanceMoved + movement_interval ; setPositionOnTract( cell_id , LTin_loc)
+			; if distanceToMove == 0 then move_finished = true end ; if
+			check_valid_location_on_grid ( LTin_loc ) == true then contactedCell_ID =
+			collision_check ( LTin_loc , tracking , cell_id , "LTin" ) ;
+			probabilityOfAdhesion = calculate_probability_adhesion ( contactedCell_ID )
+			else stop_cell_on_schedule( cell_id) ; move_finished = true ;
+			probabilityOfAdhesion = 0 end end
 		}
 		state Disassociated {
-			entry disassociate_cells() ; move_finished = true ; contactedCell = false
+			
+		 
+		
+		
+		entry angle_to_move = avoidCellCollision ( LTin_loc , distanceToMove ,
+			contactedCell_ID ) ; LTin_loc = calculateNewPosition ( LTin_loc ,
+			angle_to_move , distanceToMove ) ; if check_valid_location_on_grid (
+			LTin_loc ) == true then setPositionOnTract( cell_id , LTin_loc) else
+			stop_cell_on_schedule( cell_id) end ; distanceMoved = distanceMoved +
+			distanceToMove ; distanceToMove = 0 ; move_finished = true ;
+			contactedCell_ID = - 1
 		}
 		state Associated {
 			entry adhered = true
 		}
-		probabilistic p0 transition t0 {
+		probabilistic p0 transition t0 {              
 			from i0
 			to Motile
 		}
 		transition t1 {
 			from p0
 			to Disassociated
-			probability 1 - probabilityOfAdhesion
+			probability 1 - probabilityOfAdhesion                          
 		}
 		transition t2 {
 			from Motile
 			to p0
 			trigger
-			condition contactedCell == true
+			condition contactedCell_ID != - 1
 		}
 		transition t3 {
 			from p0
@@ -54,25 +79,40 @@ stm LTin_State_Machine {
 			from Motile
 			to Motile
 			trigger
-			condition contactedCell == false /\ move_finished == false
+			condition contactedCell_ID == - 1 /\ move_finished == false
 		}
-		entry angle_to_move = calculate_angle_from_direction ( 99 ) ; move_finished =
-		false
+		
+	entry distanceToMove = cellSpeed ; distanceMoved = 0 ; movement_interval = 0.1
+		; angle_to_move = calculate_angle_from_direction ( 99 ) ; move_finished =
+		false 
+	exit update_tracking_stats( tracking , cell_id , LTin_loc , distanceMoved)
 	}
 	initial i0
 	state Adhesion_Response {
 		state Adhered {
-			entry if move_finished == false then probabilityOfAdhesion =
-			calculate_adhesion_probability ( ) end
+			
+		entry if move_finished == false then probabilityOfAdhesion =
+			calculate_probability_adhesion ( contactedCell_ID ) end
 		}
 		state Disassociated {
-			entry disassociate_cells() ; contactedCell = false ; adhered = false ;
-			move_finished = true
+			
+		
+		
+		
+		entry angle_to_move = avoidCellCollision ( LTin_loc , distanceToMove ,
+			contactedCell_ID ) ; LTin_loc = calculateNewPosition ( LTin_loc ,
+			angle_to_move , distanceToMove ) ; if check_valid_location_on_grid (
+			LTin_loc ) == true then setPositionOnTract( cell_id , LTin_loc) else
+			stop_cell_on_schedule( cell_id) end ; distanceMoved = distanceMoved +
+			distanceToMove ; distanceToMove = 0 ; move_finished = true ;
+			contactedCell_ID = - 1 ; adhered = false
 		}
 		probabilistic p0 initial i0
 		transition t0 {
 			from Adhered
 			to p0
+		trigger
+			condition move_finished == false
 		}
 		transition t1 {
 			from p0
@@ -88,47 +128,61 @@ stm LTin_State_Machine {
 			from i0
 			to Adhered
 		}
-		entry angle_to_move = calculate_angle_from_direction ( 99 ) ; move_finished =
-		false
+		
+	entry distanceToMove = cellSpeed ; distanceMoved = 0 ; angle_to_move =
+		calculate_angle_from_direction ( 99 ) ; move_finished = false 
+	exit
+		update_tracking_stats( tracking , cell_id , LTin_loc , distanceMoved)
 	}
 	transition t0 {
 		from i0
 		to Moving
+	trigger
+		action # T
 	}
 	transition t1 {
 		from Moving
 		to Moving
 		trigger
-		condition contactedCell == false /\ chemokine_in_environment == false /\ since
-		( T ) > 0
+		condition contactedCell_ID == - 1 /\ since ( T ) > 0
 		action 
+	
 	# T
 	}
 	transition t2 {
 		from Adhesion_Response
 		to Adhesion_Response
 		trigger
-		condition contactedCell == true /\ since ( T ) > 0
+		condition contactedCell_ID != - 1 /\ since ( T ) > 0
 		action 
+	
 	# T
 	}
 	transition t3 {
 		from Moving
 		to Adhesion_Response
 		trigger
-		condition contactedCell == true /\ adhered == true /\ since ( T ) > 0
+		condition contactedCell_ID != - 1 /\ adhered == true /\ since ( T ) > 0
 		action 
+	
 	# T
 	}
 	transition t4 {
 		from Adhesion_Response
 		to Moving
 		trigger
-		condition contactedCell == false /\ since ( T ) > 0
+		condition contactedCell_ID == - 1 /\ since ( T ) > 0
 		action 
+	
 	# T
 	}
 	clock T
+var distanceToMove : real
+	var distanceMoved : real
+	var movement_interval : real = 0.1
+	
+	
+requires Operations
 }
 module LTin_Module {
 	cref ctrl_ref0 = LTin_Controller

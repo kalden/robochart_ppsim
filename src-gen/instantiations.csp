@@ -5,7 +5,7 @@ nametype string = LSeq(Char,2)
 LTo_LTo_State_Machine_retLigandProbability = 0
 
 -- generate calculate_adhesion_probability
-calculate_adhesion_probability() = 0
+calculate_adhesion_probability(contactedCell_ID,ppsim) = 0
 
 -- generate LTiStep_cellDivisionTime
 LTiStep_cellDivisionTime = 0
@@ -16,11 +16,17 @@ LTo_Step_retLigandTime = 0
 -- generate chemotactic_walk
 chemotactic_walk() = true
 
+-- generate collision_check
+collision_check(cell_loc,tracking,cell_id,cellType) = 0
+
 -- generate LTi_LTiStep_cellDivisionTime
 LTi_LTiStep_cellDivisionTime = 0
 
 -- generate disassociate_cells
 disassociate_cells() = true
+
+-- generate setPositionOnTract
+setPositionOnTract(cell_id,cell_loc,ppsim) = 0
 
 -- generate LTo_LTo_Step_cellDivisionTime
 LTo_LTo_Step_cellDivisionTime = 0
@@ -34,6 +40,9 @@ chemokine_direction() = 0
 -- generate Plus
 Plus(e1,e2,T) = if member(e1+e2,T) then e1+e2 else e1
 
+-- generate calculateNewPosition
+calculateNewPosition(cell_loc,angle_to_move,movement_interval) = (0,0)
+
 -- generate LTi_LTiStep_retLigandTime
 LTi_LTiStep_retLigandTime = 0
 
@@ -45,6 +54,9 @@ LTin_Step_cellDivisionTime = 0
 
 -- generate nat
 nametype nat = {0..2}
+
+-- generate calculate_high_grid_square
+calculate_high_grid_square(chemomap) = 0
 
 -- generate LTo_State_Machine_retLigandProbability
 LTo_State_Machine_retLigandProbability = 0
@@ -61,11 +73,20 @@ detect_cell_bind(loc,cellType) = true
 -- generate real
 nametype real = {0,1}
 
+-- generate divide_cells
+divide_cells(ppsim,gridLoc,adhesionExpressed,chemokineExpressed,maxExpressionReached,distance,entry_state) = 0
+
 -- generate LTiStep_retLigandTime
 LTiStep_retLigandTime = 0
 
 -- generate int
 nametype int = { -2..2}
+
+-- generate update_tracking_stats
+update_tracking_stats(tracking,cell_id,loc,distanceMoved,ppsim) = 0
+
+-- generate set_lti_contact_time
+set_lti_contact_time() = 0
 
 -- generate Random_Walk
 Random_Walk() = 0
@@ -74,7 +95,7 @@ Random_Walk() = 0
 Div(e1,e2,T) = if member(e1/e2,T) then e1/e2 else e1
 
 -- generate measure_chemokine_expression
-measure_chemokine_expression(loc) = 0
+measure_chemokine_expression(loc,chemomap) = 0
 
 -- generate Neg
 Neg(e1,T) = if member(-e1,T) then -e1 else e1
@@ -91,15 +112,33 @@ Mult(e1,e2,T) = if member(e1*e2,T) then e1*e2 else e1
 -- generate calculate_angle_from_direction
 calculate_angle_from_direction(direction) = 0
 
+-- generate calculate_probability_adhesion
+calculate_probability_adhesion(contactedCell_ID) = 0
+
 -- generate Modulus
 Modulus(e1,e2,T) = if member(e1%e2,T) then e1%e2 else e1
 
 -- generate Chemotactic_Walk
 Chemotactic_Walk() = 0
 
+-- generate check_valid_location_on_grid
+check_valid_location_on_grid(cell_loc) = true
+
+-- generate avoidCellCollision
+avoidCellCollision(cell_loc,distanceToMove,contactedCell_ID) = 0
+
+-- generate set_cell_speed
+set_cell_speed(random_num,lower_bound,upper_bound) = 0
+
 -- generate Minus
 Minus(e1,e2,T) = if member(e1-e2,T) then e1-e2 else e1
 
+-- generate set_ltin_contact_time
+set_ltin_contact_time() = 0
+
 -- generate probability_responds_to_chemokine
-probability_responds_to_chemokine() = 0
+probability_responds_to_chemokine(cell_loc,totalchemolevels,chemomap) = 0
+
+-- generate stop_cell_on_schedule
+stop_cell_on_schedule(cell_id,ppsim) = 0
 

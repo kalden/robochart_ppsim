@@ -1,45 +1,64 @@
-package
-LTo import common_functions::*
-interface LTo_Attributes {
-	var new_LTin_binding : boolean
-	var new_LTi_binding : boolean
-	var adhesionExpressed : real
+package  
+LTo import common_functions::*      
+interface LTo_Attributes {      
+	var new_LTin_binding : boolean = false  
+	var new_LTi_binding : boolean = false
+	var adhesionExpressed : real = 0
 	var chemokineExpressed : real
 var LTo_loc : Double2D
+var expressingRET : boolean  
+	var maxVCAMProbability : real
+	var retLigandTime : real
+	var maxExpressionReached : boolean
+	var adhesionIncrement : real = 0.05
+	var chemokineDecrement : real = 0.005
+	var chemokineExpressionLimit : real
+	var cellDivisionTime : int
+	var cell_id : int
+	var gridLoc : Int2D 
+var entry_state : string = "start"
+var lTinContactStateChangeTimePoint : int = - 1
+	var lTiContactStateChangeTimePoint : int = - 1
 }
 robotic platform LTo_Step {
-	provides Operations provides System_Parameters provides LTo_Attributes
-}
+	provides LTo_Attributes provides Operations
+} 
 controller LTo_Controller {
-	requires Operations requires System_Parameters requires LTo_Attributes sref
+	requires LTo_Attributes sref
 	stm_ref0 = LTo_State_Machine
+requires Operations
 }
 stm LTo_State_Machine {
-	requires System_Parameters
 	requires LTo_Attributes
-	requires Operations
-	var expressing_RET : boolean
 	const retLigandProbability : real
 	initial i0
 	state Not_Expressing_RET_Ligand {
-		entry expressing_RET = false
+		
+	entry expressingRET = false
 	}
 	state Expressing_RET_Ligand {
 		
-	entry expressing_RET = true ; new_LTin_binding = detect_cell_bind ( LTo_loc ,
-		"LTin" )
+	
+	entry expressingRET = true
 	}
 	probabilistic p0 state Upregulate_Adhesion_Molecules {
 		
-	entry new_LTin_binding = detect_cell_bind ( LTo_loc , "LTin" ) ;
-		new_LTi_binding = detect_cell_bind ( LTo_loc , "LTi" ) ; if adhesionExpressed
-		< maxVCAMProbability then adhesionExpressed = adhesionExpressed +
-		adhesionIncrement end
+	
+	
+	
+	
+	entry new_LTin_binding = false ; if lTinContactStateChangeTimePoint == - 1 then
+		lTinContactStateChangeTimePoint = set_ltin_contact_time ( ) end ; if
+		adhesionExpressed < maxVCAMProbability then adhesionExpressed =
+		adhesionExpressed + adhesionIncrement end
 	}
 	state Expressing_Chemokines {
 		state Dividing {
 			
-		entry divide_cells() ; cell_division_clock = 0
+		
+		
+		entry divide_cells( gridLoc , adhesionExpressed , chemokineExpressed ,
+			maxExpressionReached , 1 , "chemokine")
 		}
 		state Interphase {
 		entry cell_division_clock = cell_division_clock + 1
@@ -56,14 +75,17 @@ stm LTo_State_Machine {
 			condition cell_division_clock == cellDivisionTime
 		}
 		
-	entry if new_LTin_binding == true then if adhesionExpressed <
-		maxVCAMProbability then adhesionExpressed = adhesionExpressed +
-		adhesionIncrement end else if chemokineExpressed < maxChemokineExpression
-		then chemokineExpressed = chemokineExpressed + chemokineIncrement end end ;
-		if adhesionExpressed >= maxVCAMProbability /\ chemokineExpressed >=
-		maxChemokineExpression then maxExpressionReached = true end ;
-		new_LTin_binding = detect_cell_bind ( LTo_loc , "LTin" ) ; new_LTi_binding =
-		detect_cell_bind ( LTo_loc , "LTi" )
+	
+	
+	
+	
+	entry new_LTin_binding = false ; new_LTi_binding = false ; if
+		lTiContactStateChangeTimePoint == - 1 then lTiContactStateChangeTimePoint =
+		set_ltin_contact_time ( ) end ; if chemokineExpressed >
+		chemokineExpressionLimit then chemokineExpressed = chemokineExpressed -
+		chemokineDecrement end ; if adhesionExpressed > maxVCAMProbability /\
+		chemokineExpressed <= chemokineExpressionLimit then maxExpressionReached =
+		true end
 	}
 	state Mature_LTo {
 	initial i0
@@ -71,7 +93,10 @@ stm LTo_State_Machine {
 			entry cell_division_clock = cell_division_clock + 1
 		}
 		state Dividing {
-			entry divide_cells() ; cell_division_clock = 0
+			
+		
+		entry divide_cells( gridLoc , adhesionExpressed , chemokineExpressed ,
+			maxExpressionReached , 1 , "mature")
 		}
 		transition t0 {
 			from i0
@@ -88,7 +113,9 @@ stm LTo_State_Machine {
 		from i0
 		to p0
 		trigger
-		action # T ; new_LTin_binding = false ; new_LTi_binding = false
+		condition entry_state == "start"
+		action # T ; new_LTin_binding = false ; new_LTi_binding = false ;
+			cell_division_clock = 0
 	}
 	transition t1 {
 		from p0
@@ -132,7 +159,8 @@ stm LTo_State_Machine {
 		to Mature_LTo
 		trigger
 		condition maxExpressionReached == true /\ since ( T ) > 0
-		action # T
+		action 
+	# T
 	}
 	transition t8 {
 		from Expressing_Chemokines
@@ -161,7 +189,11 @@ stm LTo_State_Machine {
 		action # T
 	}
 	clock T
-var cell_division_clock : int
+var cell_division_clock : int = 0
+var maxExpressionReached : boolean
+
+	
+	requires Operations
 	transition t12 {
 		from Expressing_Chemokines
 		to Expressing_Chemokines
@@ -176,6 +208,22 @@ var cell_division_clock : int
 	trigger
 		condition since ( T ) > 0
 		action # T
+	}
+	transition t14 {
+		from i0
+		to Expressing_Chemokines
+		trigger
+		condition entry_state == "chemokine"
+		action # T ; new_LTin_binding = false ; new_LTi_binding = false ;
+			cell_division_clock = 0
+	}
+	transition t15 {
+		from i0
+		to Mature_LTo
+		trigger
+		condition entry_state == "mature"
+		action # T ; new_LTin_binding = false ; new_LTi_binding = false ;
+			cell_division_clock = 0
 	}
 }
 module LTo_Module {

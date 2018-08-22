@@ -1,38 +1,70 @@
 package
 common_functions
 import LTo::*
-interface Operations {
-	 Random_Walk() disassociate_cells()
-divide_cells()
-}
-interface System_Parameters {
-	var maxVCAMProbability : real
-var chemokine_in_environment : boolean
-const retLigandTime : real
-	var maxExpressionReached : boolean
-	var adhesionIncrement : real
-	var chemokineIncrement : real
-	var maxChemokineExpression : real
-const cellDivisionTime : int
-}
+
+
 datatype Double2D {
 	x : real
-	y : real
+	y : real 
 }
-function Chemotactic_Walk() : real {
+datatype Tracking_Stats {
+	timeTracked : real
+	trackLength : real
+	trackLengthScaled : real
+	trackedVelocity : real
+	agentTrackStartLocation : Double2D
+	agentTrackEndLocation : Double2D
+	agentPreviousLocation : Double2D
 }
-function calculate_angle_from_direction( direction : int) : int {
+
+datatype TreeMap {
+	chemokineLevel : real
+	gridSquare : int
 }
-function determine_movement_direction( high_chemokine_concentration : int) :
-int {
+datatype Int2D {
+	x : int
+	y : int
 }
-function measure_chemokine_expression( loc : Double2D) : int {
+interface Operations {
+	update_tracking_stats(  tracking : Tracking_Stats ,  cell_id : int ,  loc :
+	Double2D ,  distanceMoved : real)
+setPositionOnTract(  cell_id : int ,  cell_loc : Double2D) stop_cell_on_schedule(  cell_id : int) divide_cells(  gridLoc : Int2D ,  adhesionExpressed : real ,
+	 chemokineExpressed : real ,  maxExpressionReached : boolean ,  distance : int
+	,  entry_state : string)  
+	 
 }
-function Random_Walk() : real {
+function calculate_angle_from_direction(  direction : int) : real {
 }
-function calculate_adhesion_probability() : real {
+
+function measure_chemokine_expression(   loc : Double2D , 
+chemomap : TreeMap) : real {
 }
-function probability_responds_to_chemokine() : int {
+
+function calculate_probability_adhesion(  contactedCell_ID : int) : real {
+}
+function probability_responds_to_chemokine(  cell_loc : Double2D ,  totalchemolevels : real ,  chemomap : TreeMap) : real {
 }
 function detect_cell_bind( loc : Double2D , cellType : string) : boolean {
+}
+function calculateNewPosition(  cell_loc : Double2D ,  angle_to_move : real ,
+ movement_interval : real) : Double2D {
+}
+
+function check_valid_location_on_grid( cell_loc : Double2D) : boolean {
+}
+function collision_check(  cell_loc : Double2D ,  tracking : Tracking_Stats ,
+ cell_id : int ,  cellType : string) : int {
+}
+
+function avoidCellCollision(  cell_loc : Double2D ,  distanceToMove : real ,
+ contactedCell_ID : int) : real {
+}
+function calculate_high_grid_square( chemomap : TreeMap) : int {
+}
+
+function set_cell_speed( random_num : real , lower_bound : real , upper_bound :
+real) : real {
+}function set_ltin_contact_time() : int {
+}
+function set_lti_contact_time() : int {
 }

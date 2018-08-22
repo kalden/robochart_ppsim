@@ -1,0 +1,4 @@
+WARNING circus.robocalc.textual.robochart.impl.InitialImpl@56bb695b (name: i0) : An initial junction must have a single outgoing transition
+WARNING circus.robocalc.textual.robochart.impl.ClockExpImpl@6bb45818 : Timed expression is not constant
+WARNING circus.robocalc.textual.robochart.impl.ClockExpImpl@6e6b86e0 : Timed expression is not constant
+WARNING circus.robocalc.textual.robochart.impl.ClockExpImpl@5f5d4359 : Timed expression is not constant

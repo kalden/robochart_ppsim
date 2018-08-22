@@ -1,2 +1,3 @@
--- generate include
+-- generate includes
+include "common_functions.csp"
 

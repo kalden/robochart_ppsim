@@ -1,4 +1,5 @@
--- generate include
+-- generate includes
+include "defs/LTi_State_Machine_coreassertions.csp"
 include "defs/LTiModule_coreassertions.csp"
 include "LTi.csp"
 include "defs/LTiController_coreassertions.csp"
